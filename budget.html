@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FinTrack - Personal Finance and Budget Management Web Application">
+    <meta name="author" content="Izwan Hakimi">
+    <title>FinTrack | Budget</title>
+
+    <script src="js/storage.js"></script>
+    <script>
+        requireAuth();
+    </script>
+    <script src="js/theme.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --burg-deep: #4A1028;
+            --burg: #781F3D;
+            --burg-light: #922B4C;
+            --gold: #D4AF5A;
+            --gold-light: #F5E6B8;
+            --bg-base: #0F0B0D;
+            --bg-card: #1A1218;
+            --bg-input: #2A1E24;
+            --bg-track: #251920;
+            --txt: #F0E6EA;
+            --txt-mid: #C4A8B0;
+            --txt-muted: #7A606A;
+            --green: #2ECC9A;
+            --green-bg: rgba(46, 204, 154, 0.10);
+            --red: #E05C5C;
+            --red-bg: rgba(224, 92, 92, 0.10);
+            --amber: #E8A830;
+            --r-lg: 18px;
+            --r-sm: 9px;
+            --sh: 0 6px 24px rgba(0, 0, 0, 0.45);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: var(--bg-base);
+            color: var(--txt);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        .ft-nav {
+            background: #0A0608;
+            border-bottom: 2.5px solid var(--gold);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 24px rgba(0, 0, 0, 0.60);
+        }
+
+        .ft-nav .container {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .ft-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 0;
+            text-decoration: none;
+            transition: opacity .2s;
+        }
+
+        .ft-brand:hover {
+            opacity: .85;
+        }
+
+        .ft-brand-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            color: var(--burg-deep);
+            box-shadow: 0 2px 8px rgba(212, 175, 90, .35);
+            flex-shrink: 0;
+        }
+
+        .ft-brand-name {
+            font-size: 1.40rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            background: linear-gradient(100deg, #fff 30%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ft-nav .navbar-toggler {
+            border: 1.5px solid rgba(212, 175, 90, .5);
+            padding: 5px 9px;
+        }
+
+        .ft-nav .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28212,175,90,0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .ft-nav .nav-link {
+            color: rgba(255, 255, 255, .72) !important;
+            font-size: .875rem;
+            font-weight: 500;
+            padding: 17px 13px !important;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2.5px;
+            text-decoration: none;
+            transition: color .18s, border-color .18s;
+        }
+
+        .ft-nav .nav-link:hover {
+            color: var(--gold-light) !important;
+        }
+
+        .ft-nav .nav-link.active {
+            color: var(--gold) !important;
+            border-bottom-color: var(--gold);
+            font-weight: 700;
+        }
+
+        .ft-nav .nav-link.nav-out {
+            color: rgba(255, 255, 255, .45) !important;
+        }
+
+        .ft-nav .nav-link.nav-out:hover {
+            color: #f8adb8 !important;
+        }
+
+        .page-header {
+            padding: 36px 0 24px;
+        }
+
+        .header-accent {
+            display: inline-block;
+            width: 38px;
+            height: 3.5px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            border-radius: 2px;
+            margin-bottom: 12px;
+        }
+
+        .page-header h1 {
+            font-size: 1.70rem;
+            font-weight: 800;
+            color: var(--txt);
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: var(--txt-muted);
+            font-size: .90rem;
+            margin: 0;
+        }
+
+        .sum-card {
+            background: var(--bg-card);
+            border-radius: var(--r-lg);
+            padding: 20px 18px 16px;
+            border: 1px solid rgba(212, 175, 90, .10);
+            box-shadow: var(--sh);
+            position: relative;
+            overflow: hidden;
+            transition: transform .22s, box-shadow .22s;
+        }
+
+        .sum-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 38px rgba(0, 0, 0, .6);
+        }
+
+        .sum-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .sc-total::before {
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+        }
+
+        .sc-spent::before {
+            background: linear-gradient(90deg, var(--red), #f08080);
+        }
+
+        .sc-remain::before {
+            background: linear-gradient(90deg, var(--green), #3dd6a3);
+        }
+
+        .sum-label {
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--txt-muted);
+            margin-bottom: 4px;
+        }
+
+        .sum-value {
+            font-size: 1.55rem;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .sv-total {
+            color: var(--gold);
+        }
+
+        .sv-spent {
+            color: var(--red);
+        }
+
+        .sv-remain {
+            color: var(--green);
+        }
+
+        .ft-card {
+            background: var(--bg-card);
+            border-radius: var(--r-lg);
+            border: 1px solid rgba(212, 175, 90, .10);
+            box-shadow: var(--sh);
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+
+        .ft-card-header {
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid rgba(212, 175, 90, .10);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .card-eyebrow {
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            color: var(--gold);
+            margin-bottom: 2px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--txt);
+            margin: 0;
+        }
+
+        .card-sub {
+            font-size: .80rem;
+            color: var(--txt-muted);
+            margin-top: 2px;
+            margin-bottom: 0;
+        }
+
+        .ft-card-body {
+            padding: 22px;
+        }
+
+        .btn-set-budget {
+            border: 1.5px solid rgba(212, 175, 90, .4);
+            color: var(--gold);
+            border-radius: var(--r-sm);
+            font-size: .80rem;
+            font-weight: 700;
+            padding: 7px 14px;
+            background: rgba(212, 175, 90, .08);
+            transition: all .2s;
+        }
+
+        .btn-set-budget:hover {
+            background: rgba(212, 175, 90, .18);
+            color: var(--gold-light);
+            border-color: var(--gold);
+        }
+
+        .ft-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ft-table thead tr {
+            background: linear-gradient(90deg, #120409 0%, #1E0810 100%);
+        }
+
+        .ft-table thead th {
+            color: var(--gold);
+            font-size: .70rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            padding: 12px 18px;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .ft-table tbody tr {
+            border-bottom: 1px solid rgba(212, 175, 90, .07);
+            transition: background .15s;
+        }
+
+        .ft-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .ft-table tbody tr:hover {
+            background: rgba(212, 175, 90, .05);
+        }
+
+        .ft-table tbody td {
+            padding: 14px 18px;
+            font-size: .875rem;
+            vertical-align: middle;
+            border: none;
+            color: var(--txt);
+        }
+
+        .cat-name {
+            font-weight: 600;
+        }
+
+        .val-limit {
+            color: var(--txt-mid);
+        }
+
+        .val-spent {
+            font-weight: 600;
+        }
+
+        .val-ok {
+            color: var(--green);
+        }
+
+        .val-warn {
+            color: var(--amber);
+        }
+
+        .val-over {
+            color: var(--red);
+        }
+
+        .btn-delete-bgt {
+            background: transparent;
+            border: none;
+            color: var(--txt-muted);
+            font-size: 0.95rem;
+            padding: 5px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: color .18s, background .18s;
+        }
+
+        .btn-delete-bgt:hover {
+            color: var(--red);
+            background: var(--red-bg);
+        }
+
+        .bgt-track {
+            background: var(--bg-track);
+            border-radius: 20px;
+            height: 10px;
+            overflow: hidden;
+            min-width: 100px;
+        }
+
+        .bgt-fill {
+            height: 100%;
+            border-radius: 20px;
+            transition: width .8s ease;
+        }
+
+        .bgt-fill.ok {
+            background: linear-gradient(90deg, var(--green), #3dd6a3);
+        }
+
+        .bgt-fill.warn {
+            background: linear-gradient(90deg, var(--amber), #f0c84d);
+        }
+
+        .bgt-fill.over {
+            background: linear-gradient(90deg, var(--red), #f08080);
+        }
+
+        .bgt-pct {
+            font-size: .72rem;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .goal-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .goal-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(212, 175, 90, .14);
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        .goal-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--txt);
+        }
+
+        .goal-label {
+            font-size: .78rem;
+            color: var(--txt-muted);
+        }
+
+        .goal-track {
+            background: var(--bg-track);
+            border-radius: 30px;
+            height: 14px;
+            overflow: hidden;
+            margin: 14px 0 8px;
+        }
+
+        .goal-fill {
+            height: 100%;
+            border-radius: 30px;
+            background: linear-gradient(90deg, var(--burg) 0%, var(--gold) 100%);
+            transition: width .9s ease;
+            position: relative;
+        }
+
+        .goal-stats-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+
+        .goal-pill {
+            flex: 1;
+            min-width: 100px;
+            background: var(--bg-input);
+            border: 1px solid rgba(212, 175, 90, .15);
+            border-radius: var(--r-sm);
+            padding: 10px 14px;
+        }
+
+        .gp-label {
+            font-size: .66rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--txt-muted);
+        }
+
+        .gp-value {
+            font-size: .98rem;
+            font-weight: 800;
+            color: var(--gold);
+            margin-top: 2px;
+        }
+
+        .goal-note {
+            font-size: .82rem;
+            color: var(--txt-muted);
+            margin-top: 8px;
+        }
+
+        .ft-footer {
+            background: #0A0608;
+            border-top: 2.5px solid var(--gold);
+            color: rgba(255, 255, 255, .45);
+            text-align: center;
+            padding: 16px 12px;
+            font-size: .78rem;
+            margin-top: 32px;
+        }
+
+        @media (max-width: 991px) {
+            .ft-nav .navbar-collapse {
+                background: #0A0608;
+                border-top: 1px solid rgba(212, 175, 90, .2);
+                padding: 10px 14px 16px;
+                margin-top: 8px;
+                border-radius: 0 0 var(--r-sm) var(--r-sm);
+            }
+
+            .ft-nav .nav-link {
+                padding: 12px 10px !important;
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                margin-bottom: 2px;
+            }
+
+            .ft-nav .nav-link.active {
+                border-left-color: var(--gold);
+                background: rgba(212, 175, 90, .06);
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="css/theme.css">
+</head>
+
+<body>
+
+    <!-- Top Responsive Navigation -->
+    <nav class="navbar navbar-expand-lg ft-nav">
+        <div class="container">
+            <a class="ft-brand" href="dashboard.html">
+                <span class="ft-brand-logo" aria-hidden="true">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </span>
+                <span class="ft-brand-name">FinTrack</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
+                aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarMenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="transactions.html">
+                            <i class="bi bi-arrow-left-right"></i> Transactions
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="budget.html">
+                            <i class="bi bi-pie-chart"></i> Budget Goals
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-out" href="index.html" id="logoutLink">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="header-accent"></div>
+            <h1>Budget Goals</h1>
+            <p>Plan your monthly spending limits and monitor actual expenses by category.</p>
+        </div>
+
+        <!-- Budget Summary Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-md-4">
+                <div class="sum-card sc-total">
+                    <div class="sum-label">Total Budget</div>
+                    <div class="sum-value sv-total" id="totalBudget">RM0.00</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="sum-card sc-spent">
+                    <div class="sum-label">Total Spent</div>
+                    <div class="sum-value sv-spent" id="totalSpent">RM0.00</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="sum-card sc-remain">
+                    <div class="sum-label">Budget Remaining</div>
+                    <div class="sum-value sv-remain" id="budgetRemaining">RM0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Category Budget Table -->
+        <div class="ft-card">
+            <div class="ft-card-header">
+                <div>
+                    <div class="card-eyebrow"><i class="bi bi-wallet2 me-1"></i>Monthly Plan</div>
+                    <h2 class="card-title">Monthly Budget</h2>
+                    <p class="card-sub">Automatically synced with your recorded Expense transactions.</p>
+                </div>
+                <button type="button" class="btn btn-sm btn-set-budget" data-bs-toggle="modal"
+                    data-bs-target="#budgetModal">
+                    <i class="bi bi-plus-circle me-1"></i>Set Budget
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="ft-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Budget (RM)</th>
+                            <th>Spent (RM)</th>
+                            <th>Remaining (RM)</th>
+                            <th>Progress</th>
+                            <th style="text-align:center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="budgetTableBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Savings Goal Card -->
+        <div class="ft-card">
+            <div class="ft-card-header">
+                <div>
+                    <div class="card-eyebrow"><i class="bi bi-trophy-fill me-1"></i>Goal Tracker</div>
+                    <h2 class="card-title">Savings Goal</h2>
+                    <p class="card-sub">Progress towards your personal savings target.</p>
+                </div>
+            </div>
+
+            <div class="ft-card-body">
+                <div class="goal-header">
+                    <div class="goal-icon">
+                        <i class="bi bi-piggy-bank-fill"></i>
+                    </div>
+                    <div>
+                        <div class="goal-name" id="goalName">No active goal set</div>
+                        <div class="goal-label" id="goalAmounts">RM0.00 of RM0.00</div>
+                    </div>
+                </div>
+
+                <div class="goal-track" role="progressbar" aria-label="Savings goal progress" aria-valuemin="0"
+                    aria-valuemax="100" aria-valuenow="0" id="goalProgressBar">
+                    <div class="goal-fill" id="goalFill" style="width:0%;"></div>
+                </div>
+
+                <p class="goal-note" id="goalNote">Keep saving to reach your goal!</p>
+
+                <div class="goal-stats-row">
+                    <div class="goal-pill">
+                        <div class="gp-label">Saved</div>
+                        <div class="gp-value" id="goalSaved">RM0.00</div>
+                    </div>
+                    <div class="goal-pill">
+                        <div class="gp-label">Target</div>
+                        <div class="gp-value" id="goalTarget">RM0.00</div>
+                    </div>
+                    <div class="goal-pill">
+                        <div class="gp-label">Progress</div>
+                        <div class="gp-value" id="goalPct">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Set Monthly Budget Modal -->
+    <div class="modal fade" id="budgetModal" tabindex="-1" aria-labelledby="budgetModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"
+                style="background: #1A1218; border: 1px solid rgba(212,175,90,.3); border-radius: 18px; color: #F0E6EA; box-shadow: 0 20px 60px rgba(0,0,0,0.7);">
+                <div class="modal-header" style="border-bottom: 1px solid rgba(212,175,90,.15); padding: 18px 24px;">
+                    <div>
+                        <div class="card-eyebrow"><i class="bi bi-wallet2 me-1"></i>Budget Allocation</div>
+                        <h5 class="modal-title fw-bold" id="budgetModalLabel"
+                            style="color: #F0E6EA; font-size: 1.15rem; margin-top: 2px;">Set Monthly Category Budget</h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <form id="budgetForm">
+                    <div class="modal-body" style="padding: 24px;">
+                        <div id="budgetAlert" class="alert d-none py-2 px-3 mb-3 fw-semibold small" role="alert"></div>
+
+                        <div class="mb-3">
+                            <label for="budgetCategoryInput" class="form-label"
+                                style="font-size: .80rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #C4A8B0;">
+                                Expense Category <span class="text-danger">*</span>
+                            </label>
+                            <select id="budgetCategoryInput" class="form-select"
+                                style="background: #2A1E24; border: 1px solid rgba(212,175,90,.25); color: #F0E6EA; border-radius: 10px; padding: 10px 14px;"
+                                required>
+                                <option value="" disabled selected>Select a category</option>
+                                <option value="Food">Food</option>
+                                <option value="Transportation">Transportation</option>
+                                <option value="Bills">Bills</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Education">Education</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-2">
+                            <label for="budgetLimitInput" class="form-label"
+                                style="font-size: .80rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #C4A8B0;">
+                                Monthly Limit (RM) <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" id="budgetLimitInput" class="form-control" placeholder="e.g. 500.00"
+                                step="0.01" min="0.01"
+                                style="background: #2A1E24; border: 1px solid rgba(212,175,90,.25); color: #F0E6EA; border-radius: 10px; padding: 10px 14px;"
+                                required>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid rgba(212,175,90,.15); padding: 16px 24px;">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                            style="border-radius: 10px; font-weight: 600; font-size: .88rem; color: #C4A8B0; border-color: rgba(212,175,90,.3);">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn"
+                            style="background: linear-gradient(135deg, var(--burg) 0%, var(--burg-deep) 100%); color: #F5E6B8; border: 1px solid rgba(212,175,90,.4); border-radius: 10px; font-weight: 700; font-size: .88rem; padding: 8px 20px;">
+                            <i class="bi bi-save2 me-1"></i>Save Budget
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Single Consistent Footer -->
+    <footer class="ft-footer">
+        <p class="mb-1 fw-semibold text-light">FinTrack &copy; 2026. All Rights Reserved.</p>
+        <small>Developed for IMS566 Individual Project &mdash; Advanced Web Design Development &amp; Content Management</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/budget.js"></script>
+
+    <script>
+        // Calculate overall budget summary totals
+        const budgets = (financeData && Array.isArray(financeData.budgets)) ? financeData.budgets : [];
+        const totalLimit = budgets.reduce((s, b) => s + (Number(b.limit || b.budget) || 0), 0);
+        const totalUsed = budgets.reduce((s, b) => s + (Number(b.spent) || 0), 0);
+        const totalLeft = totalLimit - totalUsed;
+
+        document.getElementById('totalBudget').textContent = formatCurrency(totalLimit);
+        document.getElementById('totalSpent').textContent = formatCurrency(totalUsed);
+        document.getElementById('budgetRemaining').textContent = formatCurrency(Math.max(totalLeft, 0));
+
+        // Render budget table and savings goal progress
+        displayBudgets();
+        displaySavingsGoal();
+
+        // Attach logout event listener
+        const logoutLink = document.getElementById("logoutLink");
+        if (logoutLink) {
+            logoutLink.addEventListener("click", function (e) {
+                e.preventDefault();
+                logoutCurrentUser();
+            });
+        }
+    </script>
+
+</body>
+</html>

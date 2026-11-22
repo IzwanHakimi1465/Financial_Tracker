@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FinTrack - Personal Finance and Budget Management Web Application">
+    <meta name="author" content="Izwan Hakimi">
+    <title>FinTrack | Dashboard</title>
+
+    <script src="js/storage.js"></script>
+    <script>
+        requireAuth();
+    </script>
+    <script src="js/theme.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --burg-deep: #4A1028;
+            --burg: #781F3D;
+            --burg-light: #922B4C;
+            --gold: #D4AF5A;
+            --gold-light: #F5E6B8;
+
+            --bg-base: #0F0B0D;
+            --bg-card: #1A1218;
+            --bg-card2: #231820;
+            --bg-input: #2A1E24;
+            --gold-pale: #1E1710;
+            --cream: #0F0B0D;
+            --white: #1A1218;
+
+            --txt: #F0E6EA;
+            --txt-mid: #C4A8B0;
+            --txt-muted: #7A606A;
+
+            --green: #2ECC9A;
+            --green-bg: rgba(46, 204, 154, 0.10);
+            --red: #E05C5C;
+            --red-bg: rgba(224, 92, 92, 0.10);
+
+            --r-lg: 20px;
+            --r-md: 14px;
+            --r-sm: 9px;
+
+            --sh-xs: 0 1px 6px rgba(0, 0, 0, 0.35);
+            --sh-sm: 0 4px 16px rgba(0, 0, 0, 0.40);
+            --sh-md: 0 8px 28px rgba(0, 0, 0, 0.50);
+            --sh-lg: 0 16px 48px rgba(0, 0, 0, 0.60);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: var(--bg-base);
+            color: var(--txt);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        .ft-nav {
+            background: #0A0608;
+            border-bottom: 2.5px solid var(--gold);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 24px rgba(0, 0, 0, 0.60);
+        }
+
+        .ft-nav .container {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .ft-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 0;
+            text-decoration: none;
+            transition: opacity .2s;
+        }
+
+        .ft-brand:hover {
+            opacity: .85;
+        }
+
+        .ft-brand-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            color: var(--burg-deep);
+            box-shadow: 0 2px 8px rgba(212, 175, 90, .35);
+            flex-shrink: 0;
+        }
+
+        .ft-brand-name {
+            font-size: 1.40rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            background: linear-gradient(100deg, #fff 30%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ft-nav .navbar-toggler {
+            border: 1.5px solid rgba(212, 175, 90, .5);
+            padding: 5px 9px;
+        }
+
+        .ft-nav .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28212,175,90,0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .ft-nav .nav-link {
+            color: rgba(255, 255, 255, .72) !important;
+            font-size: .875rem;
+            font-weight: 500;
+            padding: 17px 13px !important;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2.5px;
+            text-decoration: none;
+            transition: color .18s, border-color .18s;
+            white-space: nowrap;
+        }
+
+        .ft-nav .nav-link:hover {
+            color: var(--gold-light) !important;
+        }
+
+        .ft-nav .nav-link.active {
+            color: var(--gold) !important;
+            border-bottom-color: var(--gold);
+            font-weight: 700;
+        }
+
+        .ft-nav .nav-link.nav-out {
+            color: rgba(255, 255, 255, .45) !important;
+        }
+
+        .ft-nav .nav-link.nav-out:hover {
+            color: #f8adb8 !important;
+        }
+
+        .dash-hero {
+            background:
+                linear-gradient(135deg, var(--burg-deep) 0%, var(--burg) 55%, #A0384F 100%);
+            padding: 44px 0 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dash-hero::before,
+        .dash-hero::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            opacity: .07;
+        }
+
+        .dash-hero::before {
+            width: 420px;
+            height: 420px;
+            background: var(--gold);
+            top: -140px;
+            right: -100px;
+        }
+
+        .dash-hero::after {
+            width: 260px;
+            height: 260px;
+            background: var(--gold-light);
+            bottom: -100px;
+            left: -60px;
+        }
+
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: rgba(212, 175, 90, .18);
+            border: 1px solid rgba(212, 175, 90, .35);
+            border-radius: 30px;
+            color: var(--gold-light);
+            font-size: .75rem;
+            font-weight: 600;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            padding: 4px 13px;
+            margin-bottom: 14px;
+        }
+
+        .hero-eyebrow .dot {
+            width: 6px;
+            height: 6px;
+            background: var(--gold);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: .4;
+                transform: scale(.7);
+            }
+        }
+
+        .dash-hero h1 {
+            font-size: 2.1rem;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            letter-spacing: -.5px;
+        }
+
+        .dash-hero h1 span {
+            background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .dash-hero p {
+            color: rgba(255, 255, 255, .65);
+            font-size: .95rem;
+            max-width: 480px;
+            line-height: 1.6;
+        }
+
+        .hero-rule {
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold) 0%, rgba(212, 175, 90, .1) 100%);
+            border: none;
+            margin: 0;
+        }
+
+        .stats-strip {
+            margin-top: -36px;
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: var(--r-lg);
+            padding: 22px 20px 18px;
+            box-shadow: var(--sh-md);
+            border: 1px solid rgba(212, 175, 90, 0.10);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sh-lg);
+            border-color: rgba(212, 175, 90, 0.22);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3.5px;
+        }
+
+        .stat-card.sc-income::before {
+            background: linear-gradient(90deg, var(--green), #3dd6a3);
+        }
+
+        .stat-card.sc-expense::before {
+            background: linear-gradient(90deg, var(--red), #f08080);
+        }
+
+        .stat-card.sc-balance::before {
+            background: linear-gradient(90deg, var(--burg), var(--burg-light));
+        }
+
+        .stat-card.sc-savings::before {
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+        }
+
+        /* faint background glyph */
+        .stat-card-bg-icon {
+            position: absolute;
+            bottom: -10px;
+            right: -4px;
+            font-size: 5.5rem;
+            opacity: .06;
+            line-height: 1;
+            pointer-events: none;
+            color: var(--gold);
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 14px;
+        }
+
+        .si-income {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .si-expense {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .si-balance {
+            background: rgba(146, 43, 76, .20);
+            color: #E07090;
+        }
+
+        .si-savings {
+            background: rgba(212, 175, 90, .14);
+            color: var(--gold);
+        }
+
+        .stat-label {
+            font-size: .73rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            color: var(--txt-muted);
+            margin-bottom: 3px;
+        }
+
+        .stat-value {
+            font-size: 1.62rem;
+            font-weight: 800;
+            line-height: 1.1;
+            overflow-wrap: anywhere;
+            margin-bottom: 3px;
+        }
+
+        .sv-income {
+            color: var(--green);
+        }
+
+        .sv-expense {
+            color: var(--red);
+        }
+
+        .sv-balance {
+            color: #E07090;
+        }
+
+        .sv-savings {
+            color: var(--gold);
+        }
+
+        .stat-sub {
+            font-size: .76rem;
+            color: var(--txt-muted);
+        }
+
+        .ft-card {
+            background: var(--bg-card);
+            border-radius: var(--r-lg);
+            box-shadow: var(--sh-sm);
+            border: 1px solid rgba(212, 175, 90, .10);
+            overflow: hidden;
+        }
+
+        .ft-card-header {
+            padding: 20px 22px 16px;
+            border-bottom: 1px solid rgba(212, 175, 90, .12);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .ft-card-header-left {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-eyebrow {
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            color: var(--gold);
+            margin-bottom: 2px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--txt);
+            margin: 0;
+        }
+
+        .card-sub {
+            font-size: .78rem;
+            color: var(--txt-muted);
+            margin-top: 2px;
+        }
+
+        .ft-card-body {
+            padding: 22px;
+        }
+
+        .chart-card {
+            background: linear-gradient(160deg, #1E0810 0%, #120409 100%);
+            border-color: rgba(212, 175, 90, .20);
+        }
+
+        .chart-card .ft-card-header {
+            border-bottom-color: rgba(212, 175, 90, .18);
+        }
+
+        .chart-card .card-eyebrow {
+            color: var(--gold);
+        }
+
+        .chart-card .card-title {
+            color: var(--txt);
+        }
+
+        .chart-card .card-sub {
+            color: var(--txt-muted);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 270px;
+        }
+
+        .goal-pct-ring {
+            font-size: 2.6rem;
+            font-weight: 900;
+            color: var(--gold);
+            letter-spacing: -2px;
+            line-height: 1;
+        }
+
+        .goal-pct-label {
+            font-size: .75rem;
+            font-weight: 600;
+            color: var(--txt-muted);
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .goal-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--txt);
+        }
+
+        .goal-amounts {
+            font-size: .83rem;
+            color: var(--txt-mid);
+        }
+
+        .progress-track {
+            background: #2A1E24;
+            border-radius: 30px;
+            height: 12px;
+            overflow: hidden;
+            margin: 10px 0 7px;
+        }
+
+        #savingsProgressFill {
+            height: 100%;
+            border-radius: 30px;
+            background: linear-gradient(90deg, var(--burg) 0%, var(--gold) 100%);
+            transition: width 1s cubic-bezier(.25, .8, .25, 1);
+            position: relative;
+        }
+
+        #savingsProgressFill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -60%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .28), transparent);
+            animation: shimmer 2.2s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                left: -60%;
+            }
+
+            100% {
+                left: 130%;
+            }
+        }
+
+        .goal-remaining {
+            font-size: .80rem;
+            color: var(--txt-muted);
+        }
+
+        .goal-pill-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+
+        .goal-pill {
+            flex: 1;
+            min-width: 110px;
+            background: var(--bg-input);
+            border: 1px solid rgba(212, 175, 90, .18);
+            border-radius: var(--r-sm);
+            padding: 10px 12px;
+        }
+
+        .goal-pill-label {
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--txt-muted);
+        }
+
+        .goal-pill-value {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--gold);
+            margin-top: 1px;
+        }
+
+        .txn-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 22px 14px;
+            border-bottom: 1px solid rgba(212, 175, 90, .10);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn-view-all {
+            font-size: .78rem;
+            font-weight: 700;
+            color: var(--gold);
+            border: 1.5px solid rgba(212, 175, 90, .35);
+            border-radius: var(--r-sm);
+            padding: 5px 15px;
+            background: transparent;
+            text-decoration: none;
+            transition: background .2s, color .2s, border-color .2s;
+        }
+
+        .btn-view-all:hover {
+            background: rgba(212, 175, 90, .12);
+            color: var(--gold-light);
+            border-color: var(--gold);
+        }
+
+        .ft-table {
+            margin: 0;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ft-table thead tr {
+            background: linear-gradient(90deg, #120409 0%, #1E0810 100%);
+        }
+
+        .ft-table thead th {
+            color: var(--gold);
+            font-size: .70rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            padding: 11px 18px;
+            border: none;
+        }
+
+        .ft-table tbody tr {
+            border-bottom: 1px solid rgba(212, 175, 90, .07);
+            transition: background .15s;
+        }
+
+        .ft-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .ft-table tbody tr:hover {
+            background: rgba(212, 175, 90, .05);
+        }
+
+        .ft-table tbody td {
+            padding: 13px 18px;
+            font-size: .875rem;
+            vertical-align: middle;
+            border: none;
+            color: var(--txt);
+        }
+
+        .txn-date {
+            font-size: .80rem;
+            color: var(--txt-muted);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .txn-category {
+            font-weight: 600;
+            color: var(--txt);
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: .72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 30px;
+            letter-spacing: .2px;
+        }
+
+        .pill-income {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid rgba(20, 120, 90, .2);
+        }
+
+        .pill-expense {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid rgba(184, 50, 50, .2);
+        }
+
+        .txn-amount {
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .txn-income {
+            color: var(--green);
+        }
+
+        .txn-expense {
+            color: var(--red);
+        }
+
+        .ft-footer {
+            background: #0A0608;
+            border-top: 2.5px solid var(--gold);
+            color: rgba(255, 255, 255, .30);
+            text-align: center;
+            padding: 16px 12px;
+            font-size: .76rem;
+            margin-top: 48px;
+        }
+
+        .mb-section {
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 991px) {
+            .ft-nav .navbar-collapse {
+                background: #0A0608;
+                border-top: 1px solid rgba(212, 175, 90, .2);
+                padding: 10px 14px 16px;
+                margin-top: 8px;
+                border-radius: 0 0 var(--r-sm) var(--r-sm);
+            }
+
+            .ft-nav .nav-link {
+                padding: 12px 10px !important;
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                margin-bottom: 2px;
+            }
+
+            .ft-nav .nav-link.active {
+                border-left-color: var(--gold);
+                background: rgba(212, 175, 90, .06);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .dash-hero {
+                padding: 30px 0 40px;
+            }
+
+            .dash-hero h1 {
+                font-size: 1.55rem;
+            }
+
+            .stats-strip {
+                margin-top: -24px;
+            }
+
+            .stat-value {
+                font-size: 1.35rem;
+            }
+
+            .ft-card-body {
+                padding: 16px;
+            }
+
+            .txn-header {
+                padding: 14px 16px;
+            }
+
+            .ft-table thead th,
+            .ft-table tbody td {
+                padding: 10px 12px;
+                font-size: 0.82rem;
+            }
+        }
+
+        @media (max-width: 575px) {
+            .goal-pct-ring {
+                font-size: 2.1rem;
+            }
+
+            .goal-name {
+                font-size: 0.95rem;
+            }
+
+            .chart-container {
+                height: 230px;
+            }
+
+            .goal-pill-row {
+                flex-direction: row;
+                gap: 8px;
+            }
+
+            .goal-pill {
+                min-width: unset;
+                padding: 8px 10px;
+            }
+
+            .goal-pill-value {
+                font-size: 0.88rem;
+            }
+
+            .stat-card {
+                padding: 16px 14px;
+            }
+
+            .stat-value {
+                font-size: 1.25rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .stat-card,
+            #savingsProgressFill,
+            #savingsProgressFill::after {
+                transition: none;
+                animation: none;
+            }
+
+            .hero-eyebrow .dot {
+                animation: none;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="css/theme.css">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg ft-nav">
+        <div class="container">
+
+            <a class="ft-brand" href="dashboard.html">
+                <span class="ft-brand-logo" aria-hidden="true">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </span>
+                <span class="ft-brand-name">FinTrack</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavigation"
+                aria-controls="mainNavigation" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNavigation">
+                <ul class="navbar-nav ms-auto">
+
+                    <li class="nav-item">
+                        <a class="nav-link active" href="dashboard.html">
+                            <i class="bi bi-speedometer2" aria-hidden="true"></i> Dashboard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="transactions.html">
+                            <i class="bi bi-arrow-left-right" aria-hidden="true"></i> Transactions
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="budget.html">
+                            <i class="bi bi-pie-chart" aria-hidden="true"></i> Budget Goals
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link nav-out" href="index.html" id="logoutLink">
+                            <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Logout
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dash-hero">
+        <div class="container">
+            <div class="hero-eyebrow">
+                <span class="dot"></span>
+                Live Overview
+            </div>
+            <h1>Make Every<br><span>Ringgit Count</span></h1>
+            <p>Every ringgit has a purpose. Track your progress and build a stronger financial future with FinTrack.</p>
+        </div>
+    </div>
+    <hr class="hero-rule">
+
+    <main class="container">
+
+        <div class="stats-strip">
+            <div class="row g-3">
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stat-card sc-income">
+                        <i class="bi bi-arrow-down-circle stat-card-bg-icon" aria-hidden="true"></i>
+                        <div class="stat-icon si-income">
+                            <i class="bi bi-arrow-down-circle-fill"></i>
+                        </div>
+                        <div class="stat-label">Total Income</div>
+                        <div class="stat-value sv-income" id="totalIncome">RM0.00</div>
+                        <div class="stat-sub">All money received</div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stat-card sc-expense">
+                        <i class="bi bi-arrow-up-circle stat-card-bg-icon" aria-hidden="true"></i>
+                        <div class="stat-icon si-expense">
+                            <i class="bi bi-arrow-up-circle-fill"></i>
+                        </div>
+                        <div class="stat-label">Total Expenses</div>
+                        <div class="stat-value sv-expense" id="totalExpenses">RM0.00</div>
+                        <div class="stat-sub">All money spent</div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stat-card sc-balance">
+                        <i class="bi bi-wallet2 stat-card-bg-icon" aria-hidden="true"></i>
+                        <div class="stat-icon si-balance">
+                            <i class="bi bi-wallet2"></i>
+                        </div>
+                        <div class="stat-label">Available Balance</div>
+                        <div class="stat-value sv-balance" id="balance">RM0.00</div>
+                        <div class="stat-sub">Income minus expenses</div>
+                    </div>
+                </div>
+
+                <div class="col-12 col-sm-6 col-xl-3">
+                    <div class="stat-card sc-savings">
+                        <i class="bi bi-piggy-bank stat-card-bg-icon" aria-hidden="true"></i>
+                        <div class="stat-icon si-savings">
+                            <i class="bi bi-piggy-bank-fill"></i>
+                        </div>
+                        <div class="stat-label">Savings Progress</div>
+                        <div class="stat-value sv-savings" id="savingsProgress">0%</div>
+                        <div class="stat-sub" id="savingsDetails">RM0.00 saved</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row g-4 mb-section">
+
+            <div class="col-12 col-lg-7">
+                <div class="ft-card chart-card h-100">
+                    <div class="ft-card-header">
+                        <div class="ft-card-header-left">
+                            <div class="card-eyebrow">
+                                <i class="bi bi-bar-chart-fill me-1"></i>Analytics
+                            </div>
+                            <h2 class="card-title">Expense Breakdown</h2>
+                            <p class="card-sub">Spending distribution across categories</p>
+                        </div>
+                    </div>
+                    <div class="ft-card-body">
+                        <div class="chart-container">
+                            <canvas id="expenseChart" role="img"
+                                aria-label="Doughnut chart showing expenses by category">
+                            </canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-5">
+                <div class="ft-card h-100">
+                    <div class="ft-card-header">
+                        <div class="ft-card-header-left">
+                            <div class="card-eyebrow">
+                                <i class="bi bi-trophy-fill me-1"></i>Goal Tracker
+                            </div>
+                            <h2 class="card-title">Savings Goal</h2>
+                            <p class="card-sub">Progress towards your target</p>
+                        </div>
+                        <button type="button" id="editGoalBtn" class="btn btn-sm"
+                            style="border: 1.5px solid rgba(212,175,90,.4); color: var(--gold); border-radius: var(--r-sm); font-size: .78rem; font-weight: 700; padding: 5px 12px; background: rgba(212,175,90,.08); transition: all .2s;"
+                            data-bs-toggle="modal" data-bs-target="#savingsGoalModal">
+                            <i class="bi bi-pencil-square me-1"></i>Edit Goal
+                        </button>
+                    </div>
+                    <div class="ft-card-body">
+
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div>
+                                <div class="goal-pct-ring" id="savingsProgress2">0%</div>
+                                <div class="goal-pct-label">Complete</div>
+                            </div>
+                            <div style="flex:1; min-width:0;">
+                                <div class="goal-name" id="savingsGoalName">No active goal set</div>
+                                <div class="goal-amounts" id="savingsAmounts">RM0.00 of RM0.00</div>
+                            </div>
+                        </div>
+
+                        <div class="progress-track" role="progressbar" aria-label="Savings goal progress"
+                            aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="savingsProgressBar">
+                            <div id="savingsProgressFill" style="width:0%;"></div>
+                        </div>
+
+                        <p class="goal-remaining" id="remainingSavings">Set a savings goal to start tracking.</p>
+
+                        <div class="goal-pill-row">
+                            <div class="goal-pill">
+                                <div class="goal-pill-label">Saved</div>
+                                <div class="goal-pill-value" id="savingsStatSaved">RM0.00</div>
+                            </div>
+                            <div class="goal-pill">
+                                <div class="goal-pill-label">Target</div>
+                                <div class="goal-pill-value" id="savingsStatTarget">RM0.00</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="ft-card mb-section">
+
+            <div class="txn-header">
+                <div>
+                    <div class="card-eyebrow">
+                        <i class="bi bi-clock-history me-1"></i>Latest Activity
+                    </div>
+                    <h2 class="card-title">Recent Transactions</h2>
+                </div>
+                <a href="transactions.html" class="btn-view-all">View All &rarr;</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="ft-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th style="text-align:right;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentTransactions">
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </main>
+
+    <div class="modal fade" id="savingsGoalModal" tabindex="-1" aria-labelledby="savingsGoalModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content"
+                style="background: #1A1218; border: 1px solid rgba(212,175,90,.3); border-radius: 18px; color: #F0E6EA; box-shadow: 0 20px 60px rgba(0,0,0,0.7);">
+                <div class="modal-header" style="border-bottom: 1px solid rgba(212,175,90,.15); padding: 18px 24px;">
+                    <div>
+                        <div class="card-eyebrow"><i class="bi bi-piggy-bank-fill me-1"></i>Goal Management</div>
+                        <h5 class="modal-title fw-bold" id="savingsGoalModalLabel"
+                            style="color: #F0E6EA; font-size: 1.15rem; margin-top: 2px;">Update Savings Goal</h5>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <form id="savingsGoalForm">
+                    <div class="modal-body" style="padding: 24px;">
+                        <div id="savingsGoalAlert" class="alert d-none py-2 px-3 mb-3 fw-semibold small" role="alert">
+                        </div>
+
+                        <!-- Goal Name -->
+                        <div class="mb-3">
+                            <label for="goalNameInput" class="form-label"
+                                style="font-size: .80rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #C4A8B0;">
+                                Goal Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" id="goalNameInput" class="form-control"
+                                placeholder="e.g. Emergency Fund, New Laptop, Vacation" maxlength="50"
+                                style="background: #2A1E24; border: 1px solid rgba(212,175,90,.25); color: #F0E6EA; border-radius: 10px; padding: 10px 14px;"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="goalTargetInput" class="form-label"
+                                style="font-size: .80rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #C4A8B0;">
+                                Target Amount (RM) <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" id="goalTargetInput" class="form-control" placeholder="e.g. 5000.00"
+                                step="0.01" min="0.01"
+                                style="background: #2A1E24; border: 1px solid rgba(212,175,90,.25); color: #F0E6EA; border-radius: 10px; padding: 10px 14px;"
+                                required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="goalSavedInput" class="form-label"
+                                style="font-size: .80rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #C4A8B0;">
+                                Current Amount Saved (RM) <span class="text-danger">*</span>
+                            </label>
+                            <input type="number" id="goalSavedInput" class="form-control" placeholder="e.g. 1500.00"
+                                step="0.01" min="0"
+                                style="background: #2A1E24; border: 1px solid rgba(212,175,90,.25); color: #F0E6EA; border-radius: 10px; padding: 10px 14px;"
+                                required>
+                            <small class="text-muted" style="font-size: .75rem;">Enter 0 if you are just starting this
+                                goal.</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="border-top: 1px solid rgba(212,175,90,.15); padding: 16px 24px;">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"
+                            style="border-radius: 10px; font-weight: 600; font-size: .88rem; color: #C4A8B0; border-color: rgba(212,175,90,.3);">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn"
+                            style="background: linear-gradient(135deg, var(--burg) 0%, var(--burg-deep) 100%); color: #F5E6B8; border: 1px solid rgba(212,175,90,.4); border-radius: 10px; font-weight: 700; font-size: .88rem; padding: 8px 20px;">
+                            <i class="bi bi-save2 me-1"></i>Save Goal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="ft-footer">
+        <div class="container">
+            <p class="mb-1 fw-bold" style="color: #F0E6EA;">FinTrack &copy; 2026. All Rights Reserved.</p>
+            <small style="color: #C4A8B0;">Developed for IMS566 Individual Project &mdash; Advanced Web Design Development &amp; Content Management</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+
+</html>

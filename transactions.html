@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FinTrack - Personal Finance and Budget Management Web Application">
+    <meta name="author" content="Izwan Hakimi">
+    <title>FinTrack | Transactions</title>
+
+    <script src="js/storage.js"></script>
+    <script>
+        requireAuth();
+    </script>
+    <script src="js/theme.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --burg-deep: #4A1028;
+            --burg: #781F3D;
+            --burg-light: #922B4C;
+            --gold: #D4AF5A;
+            --gold-light: #F5E6B8;
+            --bg-base: #0F0B0D;
+            --bg-card: #1A1218;
+            --bg-input: #2A1E24;
+            --txt: #F0E6EA;
+            --txt-mid: #C4A8B0;
+            --txt-muted: #7A606A;
+            --green: #2ECC9A;
+            --green-bg: rgba(46, 204, 154, 0.10);
+            --red: #E05C5C;
+            --red-bg: rgba(224, 92, 92, 0.10);
+            --r-lg: 18px;
+            --r-sm: 9px;
+            --sh: 0 6px 24px rgba(0, 0, 0, 0.45);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: var(--bg-base);
+            color: var(--txt);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+
+        .ft-nav {
+            background: #0A0608;
+            border-bottom: 2.5px solid var(--gold);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 24px rgba(0, 0, 0, 0.60);
+        }
+
+        .ft-nav .container {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .ft-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 0;
+            text-decoration: none;
+            transition: opacity .2s;
+        }
+
+        .ft-brand:hover {
+            opacity: .85;
+        }
+
+        .ft-brand-logo {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            color: var(--burg-deep);
+            box-shadow: 0 2px 8px rgba(212, 175, 90, .35);
+            flex-shrink: 0;
+        }
+
+        .ft-brand-name {
+            font-size: 1.40rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            background: linear-gradient(100deg, #fff 30%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .ft-nav .navbar-toggler {
+            border: 1.5px solid rgba(212, 175, 90, .5);
+            padding: 5px 9px;
+        }
+
+        .ft-nav .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28212,175,90,0.9%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+
+        .ft-nav .nav-link {
+            color: rgba(255, 255, 255, .72) !important;
+            font-size: .875rem;
+            font-weight: 500;
+            padding: 17px 13px !important;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2.5px;
+            text-decoration: none;
+            transition: color .18s, border-color .18s;
+        }
+
+        .ft-nav .nav-link:hover {
+            color: var(--gold-light) !important;
+        }
+
+        .ft-nav .nav-link.active {
+            color: var(--gold) !important;
+            border-bottom-color: var(--gold);
+            font-weight: 700;
+        }
+
+        .ft-nav .nav-link.nav-out {
+            color: rgba(255, 255, 255, .45) !important;
+        }
+
+        .ft-nav .nav-link.nav-out:hover {
+            color: #f8adb8 !important;
+        }
+
+        .page-header {
+            padding: 36px 0 24px;
+        }
+
+        .header-accent {
+            display: inline-block;
+            width: 38px;
+            height: 3.5px;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            border-radius: 2px;
+            margin-bottom: 12px;
+        }
+
+        .page-header h1 {
+            font-size: 1.70rem;
+            font-weight: 800;
+            color: var(--txt);
+            margin-bottom: 5px;
+        }
+
+        .page-header p {
+            color: var(--txt-muted);
+            font-size: .90rem;
+            margin: 0;
+        }
+
+        .sum-card {
+            background: var(--bg-card);
+            border-radius: var(--r-lg);
+            padding: 20px 18px 16px;
+            border: 1px solid rgba(212, 175, 90, .10);
+            box-shadow: var(--sh);
+            position: relative;
+            overflow: hidden;
+            transition: transform .22s, box-shadow .22s;
+        }
+
+        .sum-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.60);
+        }
+
+        .sum-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .sum-income::before {
+            background: linear-gradient(90deg, var(--green), #3dd6a3);
+        }
+
+        .sum-expense::before {
+            background: linear-gradient(90deg, var(--red), #f08080);
+        }
+
+        .sum-balance::before {
+            background: linear-gradient(90deg, var(--burg), var(--burg-light));
+        }
+
+        .sum-label {
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            color: var(--txt-muted);
+            margin-bottom: 4px;
+        }
+
+        .sum-value {
+            font-size: 1.55rem;
+            font-weight: 800;
+            overflow-wrap: anywhere;
+        }
+
+        .sv-income {
+            color: var(--green);
+        }
+
+        .sv-expense {
+            color: var(--red);
+        }
+
+        .sv-balance {
+            color: #E07090;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, var(--burg) 0%, var(--burg-deep) 100%);
+            color: var(--gold-light);
+            border: 1px solid rgba(212, 175, 90, .35);
+            border-radius: var(--r-sm);
+            font-size: .875rem;
+            font-weight: 700;
+            padding: 9px 20px;
+            transition: background .2s, transform .2s, box-shadow .2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .btn-add:hover {
+            background: linear-gradient(135deg, var(--burg-light) 0%, var(--burg) 100%);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+        }
+
+        .ft-card {
+            background: var(--bg-card);
+            border-radius: var(--r-lg);
+            border: 1px solid rgba(212, 175, 90, .10);
+            box-shadow: var(--sh);
+            overflow: hidden;
+        }
+
+        .ft-card-header {
+            padding: 18px 22px 14px;
+            border-bottom: 1px solid rgba(212, 175, 90, .10);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .card-eyebrow {
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            color: var(--gold);
+            margin-bottom: 2px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--txt);
+            margin: 0;
+        }
+
+        .search-input {
+            background: var(--bg-input);
+            border: 1px solid rgba(212, 175, 90, .20);
+            border-radius: var(--r-sm);
+            color: var(--txt);
+            font-size: .85rem;
+            padding: 8px 14px;
+            max-width: 260px;
+            width: 100%;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .search-input::placeholder {
+            color: var(--txt-muted);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 90, .15);
+            background: var(--bg-input);
+            color: var(--txt);
+        }
+
+        .ft-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ft-table thead tr {
+            background: linear-gradient(90deg, #120409 0%, #1E0810 100%);
+        }
+
+        .ft-table thead th {
+            color: var(--gold);
+            font-size: .70rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            padding: 12px 18px;
+            border: none;
+            white-space: nowrap;
+        }
+
+        .ft-table tbody tr {
+            border-bottom: 1px solid rgba(212, 175, 90, .07);
+            transition: background .15s;
+        }
+
+        .ft-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .ft-table tbody tr:hover {
+            background: rgba(212, 175, 90, .05);
+        }
+
+        .ft-table tbody td {
+            padding: 13px 18px;
+            font-size: .875rem;
+            vertical-align: middle;
+            border: none;
+            color: var(--txt);
+        }
+
+        .txn-date {
+            color: var(--txt-muted);
+            font-size: .80rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .txn-category {
+            font-weight: 600;
+        }
+
+        .txn-desc {
+            color: var(--txt-mid);
+            font-size: .82rem;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: .72rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 30px;
+        }
+
+        .pill-income {
+            background: var(--green-bg);
+            color: var(--green);
+            border: 1px solid rgba(46, 204, 154, .2);
+        }
+
+        .pill-expense {
+            background: var(--red-bg);
+            color: var(--red);
+            border: 1px solid rgba(224, 92, 92, .2);
+        }
+
+        .txn-amount {
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .amt-income {
+            color: var(--green);
+        }
+
+        .amt-expense {
+            color: var(--red);
+        }
+
+        .empty-msg {
+            padding: 36px;
+            text-align: center;
+            color: var(--txt-muted);
+            font-size: .88rem;
+        }
+
+        .btn-delete-txn {
+            background: transparent;
+            border: none;
+            color: var(--txt-muted);
+            font-size: 0.95rem;
+            padding: 5px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: color .18s, background .18s;
+        }
+
+        .btn-delete-txn:hover {
+            color: var(--red);
+            background: var(--red-bg);
+        }
+
+        .ft-form-label {
+            font-size: .80rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: var(--txt-mid);
+            margin-bottom: 6px;
+        }
+
+        .ft-form-control,
+        .ft-form-select {
+            background: var(--bg-input);
+            border: 1px solid rgba(212, 175, 90, .20);
+            border-radius: var(--r-sm);
+            color: var(--txt);
+            font-size: .90rem;
+            padding: 10px 14px;
+            width: 100%;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .ft-form-control:focus,
+        .ft-form-select:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 90, .18);
+            background: var(--bg-input);
+            color: var(--txt);
+        }
+
+        .ft-form-select option {
+            background: #1A1218;
+            color: #F0E6EA;
+        }
+
+        .ft-form-control::placeholder {
+            color: var(--txt-muted);
+        }
+
+        .ft-footer {
+            background: #0A0608;
+            border-top: 2.5px solid var(--gold);
+            color: rgba(255, 255, 255, .28);
+            text-align: center;
+            padding: 15px 12px;
+            font-size: .75rem;
+            margin-top: 48px;
+        }
+
+        @media (max-width: 991px) {
+            .ft-nav .navbar-collapse {
+                background: #0A0608;
+                border-top: 1px solid rgba(212, 175, 90, .2);
+                padding: 10px 14px 16px;
+                margin-top: 8px;
+                border-radius: 0 0 var(--r-sm) var(--r-sm);
+            }
+
+            .ft-nav .nav-link {
+                padding: 12px 10px !important;
+                border-bottom: none;
+                border-left: 3px solid transparent;
+                margin-bottom: 2px;
+            }
+
+            .ft-nav .nav-link.active {
+                border-left-color: var(--gold);
+                background: rgba(212, 175, 90, .06);
+            }
+        }
+
+        @media (max-width: 767px) {
+            .page-header {
+                padding: 24px 0 16px;
+            }
+
+            .page-header h1 {
+                font-size: 1.4rem;
+            }
+
+            .sum-value {
+                font-size: 1.25rem;
+            }
+
+            .sum-card {
+                padding: 16px 14px 14px;
+            }
+
+            .ft-card-header {
+                padding: 14px 16px;
+            }
+
+            .search-input {
+                max-width: 100%;
+            }
+
+            .ft-table tbody td,
+            .ft-table thead th {
+                padding: 10px 12px;
+                font-size: .82rem;
+            }
+
+            .btn-add {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 575px) {
+
+            .ft-table thead th:nth-child(1),
+            .ft-table tbody td:nth-child(1) {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="css/theme.css">
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg ft-nav">
+        <div class="container">
+            <a class="ft-brand" href="dashboard.html">
+                <span class="ft-brand-logo" aria-hidden="true">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </span>
+                <span class="ft-brand-name">FinTrack</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMenu"
+                aria-controls="navbarMenu" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarMenu">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="transactions.html">
+                            <i class="bi bi-arrow-left-right"></i> Transactions
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="budget.html">
+                            <i class="bi bi-pie-chart"></i> Budget Goals
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-out" href="index.html" id="logoutLink">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <div class="page-header">
+            <div class="header-accent"></div>
+            <h1>Transactions</h1>
+            <p>View all your income and expenses in one place.</p>
+        </div>
+
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-md-4">
+                <div class="sum-card sum-income">
+                    <div class="sum-label">Total Income</div>
+                    <div class="sum-value sv-income" id="totalIncome">RM0.00</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="sum-card sum-expense">
+                    <div class="sum-label">Total Expenses</div>
+                    <div class="sum-value sv-expense" id="totalExpenses">RM0.00</div>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="sum-card sum-balance">
+                    <div class="sum-label">Available Balance</div>
+                    <div class="sum-value sv-balance" id="availableBalance">RM0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ft-card mb-4">
+            <div class="ft-card-header">
+                <div>
+                    <div class="card-eyebrow"><i class="bi bi-plus-circle me-1"></i>New Entry</div>
+                    <h2 class="card-title">Add Income or Expense</h2>
+                </div>
+            </div>
+            <div class="p-4">
+                <div id="transactionMessage" class="alert d-none" role="alert"></div>
+
+                <form id="transactionForm">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-4">
+                            <label for="transactionType" class="ft-form-label">Transaction Type <span
+                                    class="text-danger">*</span></label>
+                            <select id="transactionType" class="ft-form-select" required>
+                                <option value="Expense" selected>Expense</option>
+                                <option value="Income">Income</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label for="transactionDate" class="ft-form-label">Date <span
+                                    class="text-danger">*</span></label>
+                            <input type="date" id="transactionDate" class="ft-form-control" required>
+                        </div>
+
+                        <div class="col-12 col-md-4">
+                            <label for="transactionAmount" class="ft-form-label">Amount (RM) <span
+                                    class="text-danger">*</span></label>
+                            <input type="number" id="transactionAmount" class="ft-form-control" step="0.01" min="0.01"
+                                placeholder="e.g. 50.00" required>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="transactionCategory" class="ft-form-label">Category <span
+                                    class="text-danger">*</span></label>
+                            <select id="transactionCategory" class="ft-form-select" required>
+                            </select>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <label for="transactionDescription" class="ft-form-label">Description (Optional)</label>
+                            <input type="text" id="transactionDescription" class="ft-form-control" maxlength="100"
+                                placeholder="e.g. Lunch with colleagues">
+                        </div>
+
+                        <div class="col-12 text-end pt-2">
+                            <button type="submit" class="btn-add">
+                                <i class="bi bi-check-circle-fill"></i> Add Transaction
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="ft-card mb-5">
+            <div class="ft-card-header">
+                <div>
+                    <div class="card-eyebrow"><i class="bi bi-clock-history me-1"></i>History</div>
+                    <h2 class="card-title">Transaction History</h2>
+                </div>
+                <input type="search" id="searchTransaction" class="search-input"
+                    placeholder="Search transactions..." aria-label="Search transactions">
+            </div>
+
+            <div class="table-responsive">
+                <table class="ft-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Category & Description</th>
+                            <th scope="col">Type</th>
+                            <th scope="col" style="text-align:right;">Amount</th>
+                            <th scope="col" style="text-align:center;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <p id="emptyMessage" class="empty-msg d-none">No transactions found.</p>
+        </div>
+
+    </main>
+
+    <footer class="ft-footer">
+        <div class="container">
+            <p class="mb-1 fw-bold" style="color: #F0E6EA;">FinTrack &copy; 2026. All Rights Reserved.</p>
+            <small style="color: #C4A8B0;">Developed for IMS566 Individual Project &mdash; Advanced Web Design Development &amp; Content Management</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/transactions.js"></script>
+
+    <script>
+
+        const logoutLink = document.getElementById("logoutLink");
+        if (logoutLink) {
+            logoutLink.addEventListener("click", function (e) {
+                e.preventDefault();
+                logoutCurrentUser();
+            });
+        }
+    </script>
+
+</body>
+</html>
