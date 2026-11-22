@@ -1,10 +1,3 @@
-/**
- * FinTrack - Sign Up Module (js/signup.js)
- * 
- * Handles user registration with validation, password confirmation,
- * duplicate username checks, and separate localStorage account creation.
- */
-
 document.addEventListener("DOMContentLoaded", function () {
     const signupForm = document.getElementById("signupForm");
     if (!signupForm) return;
