@@ -1,14 +1,3 @@
-/**
- * FinTrack - Budget & Savings Goal Module (js/budget.js)
- *
- * Manages monthly category budget allocations, syncs actual expenses
- * from transaction records, and renders savings goal progress.
- */
-
-/**
- * Calculate actual expenses per category from user transactions.
- * @returns {Object.<string, number>}
- */
 function getActualCategorySpending() {
     if (typeof getExpensesByCategory === "function") {
         return getExpensesByCategory();
@@ -16,9 +5,7 @@ function getActualCategorySpending() {
     return {};
 }
 
-/**
- * Update the top summary cards (Total Budget, Total Spent, Budget Remaining).
- */
+/* Update the top summary cards (Total Budget, Total Spent, Budget Remaining) */
 function updateBudgetSummary() {
     if (typeof loadFinanceData === "function") {
         loadFinanceData();
@@ -45,10 +32,7 @@ function updateBudgetSummary() {
     if (budgetRemainingEl) budgetRemainingEl.textContent = formatCurrency(totalLeft);
 }
 
-/**
- * Populate the monthly budget table with category limits,
- * synced spent amounts, remaining balances, progress bars, and delete actions.
- */
+/* Populate the monthly budget table with category limits */
 function displayBudgets() {
     if (typeof loadFinanceData === "function") {
         loadFinanceData();
@@ -108,10 +92,7 @@ function displayBudgets() {
     });
 }
 
-/**
- * Update the Savings Goal tracker card with target amount,
- * saved progress, percentage bar, and completion status note.
- */
+/* Update the Savings Goal tracker card with target amount */
 function displaySavingsGoal() {
     if (typeof loadFinanceData === "function") {
         loadFinanceData();
@@ -157,9 +138,7 @@ function displaySavingsGoal() {
     }
 }
 
-/**
- * Initialize Set Monthly Budget modal form submission and delete handlers.
- */
+/* Initialize Set Monthly Budget modal form submission and delete handlers */
 function setupBudgetInteractions() {
     const budgetForm = document.getElementById("budgetForm");
     const budgetModalEl = document.getElementById("budgetModal");
