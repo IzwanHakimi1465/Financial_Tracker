@@ -1,29 +1,9 @@
-/**
- * FinTrack - Storage & Theme Management Module (js/storage.js)
- * 
- * Manages user accounts, separate user financial data in localStorage,
- * active session authentication guards, and persistent Light/Dark mode theme.
- * 
- * Architecture:
- * - User registry: localStorage key "fintrack_users" -> [{ username, passwordHash, createdAt }, ...]
- * - Financial data per user: localStorage key "fintrack_data_<username>" -> { transactions: [], budgets: [], savingsGoal: null }
- * - Theme preference: localStorage key "fintrack_theme" -> "dark" | "light"
- * - Active session: sessionStorage key "username" and "isLoggedIn" ("true")
- */
-
 const STORAGE_USERS_KEY = "fintrack_users";
 const STORAGE_DATA_PREFIX = "fintrack_data_";
 const THEME_STORAGE_KEY = "fintrack_theme";
 
-/* ==========================================================================
-   1. Theme Management (Persistent Light & Dark Mode)
-   ========================================================================== */
-
-/**
- * Apply the specified theme ("dark" or "light") to the document
- * and update any theme toggle buttons on the page.
- * @param {string} theme 
- */
+/* 1. Theme Management (Persistent Light & Dark Mode) */
+/*Apply the specified theme ("dark" or "light") to the document */
 function applyTheme(theme) {
     const activeTheme = theme === "light" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", activeTheme);
@@ -42,9 +22,7 @@ function applyTheme(theme) {
     });
 }
 
-/**
- * Toggle between Light Mode and Dark Mode and save preference in localStorage.
- */
+/* Toggle between Light Mode and Dark Mode and save preference in localStorage */
 function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
     const nextTheme = currentTheme === "dark" ? "light" : "dark";
@@ -78,16 +56,8 @@ function finTrackThemeUrl(path) {
     return target.href;
 }
 
-/* ==========================================================================
-   2. Password Hashing & User Account Management
-   ========================================================================== */
-
-/**
- * Hash password using Web Crypto API SHA-256.
- * Fallback to simple hash if crypto.subtle is not supported.
- * @param {string} password 
- * @returns {Promise<string>}
- */
+/* 2. Password Hashing & User Account Management */
+/* Hash password using Web Crypto API SHA-256. */
 async function hashPassword(password) {
     if (window.crypto && window.crypto.subtle) {
         try {
@@ -110,11 +80,7 @@ async function hashPassword(password) {
     return "demo_hash_" + Math.abs(hash).toString(16);
 }
 
-/**
- * Get all registered user accounts from localStorage.
- * Migrates older "fintrackUsers" format if detected.
- * @returns {Array<{username: string, passwordHash: string, createdAt?: string}>}
- */
+/* Get all registered user accounts from localStorage */
 function getUsers() {
     let users = [];
     try {
@@ -135,19 +101,12 @@ function getUsers() {
     return Array.isArray(users) ? users : [];
 }
 
-/**
- * Save user list to localStorage.
- * @param {Array} users 
- */
+/* Save user list to localStorage */
 function saveUsers(users) {
     localStorage.setItem(STORAGE_USERS_KEY, JSON.stringify(users));
 }
 
-/**
- * Check whether a username already exists (case-insensitive).
- * @param {string} username 
- * @returns {boolean}
- */
+/* Check whether a username already exists (case-insensitive) */
 function usernameExists(username) {
     if (!username) return false;
     const users = getUsers();
@@ -157,11 +116,7 @@ function usernameExists(username) {
     );
 }
 
-/**
- * Retrieve a user's password hint without exposing the stored password.
- * @param {string} username
- * @returns {string|null}
- */
+/* Retrieve a user's password hint without exposing the stored password */
 function getPasswordHint(username) {
     if (!username) return null;
     const cleanUsername = username.trim().toLowerCase();
@@ -174,14 +129,8 @@ function getPasswordHint(username) {
         : null;
 }
 
-/* ==========================================================================
-   3. Per-User Financial Data Storage
-   ========================================================================== */
-
-/**
- * Creates empty financial data structure for a new user.
- * @returns {{transactions: Array, budgets: Array, savingsGoal: null}}
- */
+/* 3. Per-User Financial Data Storage */
+/* Creates empty financial data structure for a new user */
 function createEmptyFinancialData() {
     return {
         transactions: [],
@@ -190,22 +139,13 @@ function createEmptyFinancialData() {
     };
 }
 
-/**
- * Generates the storage key for a user's financial data.
- * @param {string} username 
- * @returns {string}
- */
+/* Generates the storage key for a user's financial data */
 function getUserDataKey(username) {
     if (!username) return "";
     return STORAGE_DATA_PREFIX + username.trim().toLowerCase();
 }
 
-/**
- * Initialize empty financial data for a user in localStorage.
- * Does not overwrite if data already exists.
- * @param {string} username 
- * @returns {Object} the initialized financial data
- */
+/* Initialize empty financial data for a user in localStorage */
 function initUserFinancialData(username) {
     const key = getUserDataKey(username);
     if (!key) return createEmptyFinancialData();
@@ -225,13 +165,7 @@ function initUserFinancialData(username) {
     }
 }
 
-/**
- * Register a new user account and initialize their separate financial data.
- * @param {string} username 
- * @param {string} password
- * @param {string} passwordHint
- * @returns {Promise<{success: boolean, message: string}>}
- */
+/* Register a new user account and initialize their separate financial data */
 async function registerUser(username, password, passwordHint) {
     const cleanUsername = (username || "").trim();
     const cleanPasswordHint = (passwordHint || "").trim();
