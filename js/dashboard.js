@@ -143,9 +143,7 @@ function updateDashboard() {
     renderExpenseChart();
 }
 
-/**
- * Render or refresh the Doughnut Chart for expense breakdown
- */
+/** Render or refresh the Doughnut Chart for expense breakdown */
 function renderExpenseChart() {
     const canvas = document.getElementById("expenseChart");
     if (!canvas || typeof Chart === "undefined") return;
@@ -225,9 +223,7 @@ document.addEventListener("fintrack-theme-change", () => {
     }
 });
 
-/**
- * Setup Savings Goal Modal event listeners and form submission
- */
+/* Setup Savings Goal Modal event listeners and form submission */
 function setupSavingsGoalModal() {
     const editBtn = document.getElementById("editGoalBtn");
     const goalModalEl = document.getElementById("savingsGoalModal");
