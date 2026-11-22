@@ -1,11 +1,3 @@
-/**
- * FinTrack - Transactions Module (js/transactions.js)
- * 
- * Handles adding new transactions (Income / Expense), category updating,
- * client-side form validation, saving to localStorage per-user, deleting transactions,
- * and refreshing financial summary cards and table rows in real time.
- */
-
 document.addEventListener("DOMContentLoaded", function () {
     // Category mapping per requirement
     const CATEGORIES = {
@@ -30,9 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const totalExpensesEl = document.getElementById("totalExpenses");
     const availableBalanceEl = document.getElementById("availableBalance");
 
-    /**
-     * Set default date in date input to today (YYYY-MM-DD)
-     */
+    /** Set default date in date input to today (YYYY-MM-DD) **/
     function setDefaultDate() {
         if (dateInput && !dateInput.value) {
             const today = new Date().toISOString().split("T")[0];
@@ -40,11 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    /**
-     * Populate category dropdown according to selected transaction type
-     * @param {string} selectedType "Income" or "Expense"
-     * @param {string|null} preferredCategory
-     */
+    /** Populate category dropdown according to selected transaction type **/
     function updateCategoryOptions(selectedType, preferredCategory = null) {
         if (!categorySelect) return;
         const type = (selectedType === "Income") ? "Income" : "Expense";
@@ -62,11 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /**
-     * Show feedback message (success or error)
-     * @param {string} text 
-     * @param {boolean} isError 
-     */
+    /** Show feedback message (success or error) **/
     function displayMessage(text, isError = false) {
         if (!messageAlert) return;
         messageAlert.textContent = text;
@@ -82,9 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }, 4000);
     }
 
-    /**
-     * Refresh financial summary values on the page using calculations from js/data.js
-     */
+    /** Refresh financial summary values on the page using calculations from js/data.js **/
     function updateSummaryTotals() {
         if (typeof loadFinanceData === "function") {
             loadFinanceData();
